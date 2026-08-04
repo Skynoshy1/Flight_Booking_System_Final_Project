@@ -1,0 +1,279 @@
+/**
+ * Global Styles - Traveloka Flight Booking System
+ * Imports Bootstrap and applies custom overrides
+ */
+
+@import './variables.scss';
+
+// ============================================
+// BOOTSTRAP OVERRIDES
+// ============================================
+
+// Override Bootstrap variables before import
+$primary: $traveloka-blue;
+$secondary: $traveloka-orange;
+$body-bg: $sky-blue-bg;
+$body-color: $dark-text;
+$font-family-base: $font-family-base;
+
+// Import Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// ============================================
+// GLOBAL RESETS
+// ============================================
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-family-base;
+  background-color: $sky-blue-bg;
+  color: $dark-text;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ============================================
+// UTILITY CLASSES
+// ============================================
+
+.text-traveloka-blue {
+  color: $traveloka-blue !important;
+}
+
+.text-traveloka-orange {
+  color: $traveloka-orange !important;
+}
+
+.bg-traveloka-blue {
+  background-color: $traveloka-blue !important;
+}
+
+.bg-traveloka-orange {
+  background-color: $traveloka-orange !important;
+}
+
+.bg-sky-blue {
+  background-color: $sky-blue-bg !important;
+}
+
+// ============================================
+// BUTTON STYLES
+// ============================================
+
+.btn-traveloka-primary {
+  background-color: $traveloka-orange;
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $border-radius-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($traveloka-orange, 8%);
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-traveloka-secondary {
+  background-color: $traveloka-blue;
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $border-radius-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($traveloka-blue, 8%);
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.btn-outline-traveloka {
+  background-color: transparent;
+  color: $traveloka-blue;
+  border: 2px solid $traveloka-blue;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $border-radius-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $traveloka-blue;
+    color: $white;
+    transform: translateY(-2px);
+  }
+}
+
+// ============================================
+// CARD STYLES
+// ============================================
+
+.card-traveloka {
+  background: $white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-md;
+  padding: $spacing-lg;
+  transition: all $transition-base;
+  border: none;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-hover;
+  }
+}
+
+// ============================================
+// PILL NAVIGATION
+// ============================================
+
+.pill-nav {
+  display: inline-flex;
+  background: $white;
+  border-radius: $border-radius-pill;
+  padding: $spacing-xs;
+  border: 1px solid #E5E7EB;
+  gap: $spacing-xs;
+
+  .pill-item {
+    padding: $spacing-sm $spacing-lg;
+    border-radius: $border-radius-pill;
+    background: transparent;
+    border: none;
+    color: $gray-text;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all $transition-base;
+
+    &:hover {
+      background: $sky-blue-bg;
+    }
+
+    &.active {
+      background: $traveloka-blue;
+      color: $white;
+    }
+  }
+}
+
+// ============================================
+// PAGE TRANSITIONS
+// ============================================
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity $transition-page;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-fade-enter-active {
+  transition: all $transition-slow;
+}
+
+.slide-fade-leave-active {
+  transition: all $transition-fast;
+}
+
+.slide-fade-enter-from {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  transform: translateX(-20px);
+  opacity: 0;
+}
+
+// ============================================
+// LOADING SPINNER
+// ============================================
+
+.spinner-traveloka {
+  border: 3px solid $sky-blue-bg;
+  border-top: 3px solid $traveloka-blue;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// ============================================
+// PULSE ANIMATION (for selected seats)
+// ============================================
+
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 94, 31, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 94, 31, 0);
+  }
+}
+
+.pulse-border {
+  animation: pulse-border 2s infinite;
+}
+
+// ============================================
+// CONTAINER
+// ============================================
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+// ============================================
+// RESPONSIVE UTILITIES
+// ============================================
+
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: $breakpoint-md) {
+  .card-traveloka {
+    padding: $spacing-md;
+  }
+
+  .btn-traveloka-primary,
+  .btn-traveloka-secondary {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-sm;
+  }
+}
+

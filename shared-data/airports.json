@@ -1,0 +1,15 @@
+[
+  { "city": "Hanoi", "code": "HAN", "name": "Noi Bai" },
+  { "city": "Ho Chi Minh City", "code": "SGN", "name": "Tan Son Nhat" },
+  { "city": "Da Nang", "code": "DAD", "name": "Da Nang" },
+  { "city": "Nha Trang", "code": "CXR", "name": "Cam Ranh" },
+  { "city": "Phu Quoc", "code": "PQC", "name": "Phu Quoc" },
+  { "city": "Rach Gia", "code": "VKG", "name": "Rach Gia" },
+  { "city": "Ha Long", "code": "VDO", "name": "Van Don" },
+  { "city": "Da Lat", "code": "DLI", "name": "Lien Khuong" },
+  { "city": "Hue", "code": "HUI", "name": "Phu Bai" },
+  { "city": "Quy Nhon", "code": "UIH", "name": "Phu Cat" },
+  { "city": "Con Dao", "code": "VCS", "name": "Con Dao" },
+  { "city": "Vinh", "code": "VII", "name": "Vinh" },
+  { "city": "Hai Phong", "code": "HPH", "name": "Cat Bi" }
+]
