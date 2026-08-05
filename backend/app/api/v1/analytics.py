@@ -91,8 +91,8 @@ def get_admin_analytics():
 def get_dashboard_stats():
     try:
         from sqlalchemy import create_engine, text
-        import os
-        engine = create_engine(os.getenv("DATABASE_URL"))
+        from app.core.config import settings
+        engine = create_engine(settings.DATABASE_URL)
         with engine.connect() as conn:
             rev_res = conn.execute(text("SELECT COALESCE(SUM(total_price), 0.0), COUNT(id) FROM bookings")).fetchone()
             total_revenue = float(rev_res[0])
