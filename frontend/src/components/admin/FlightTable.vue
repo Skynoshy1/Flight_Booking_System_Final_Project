@@ -468,6 +468,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { API_URL } from '@/utils/apiClient';
 
 const props = defineProps({
   flights: {
@@ -589,7 +590,7 @@ const closeDropdownOnOutside = () => {
 
 const fetchAirports = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/airports/all');
+    const response = await fetch(`${API_URL}/airports/all`);
     if (response.ok) {
       localAirports.value = await response.json();
     }
@@ -699,7 +700,7 @@ const submitAddFlight = async () => {
       status: 'ON TIME'
     };
 
-    const response = await fetch('http://127.0.0.1:8000/api/v1/flights', {
+    const response = await fetch(`${API_URL}/flights`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -747,7 +748,7 @@ const saveFlight = async () => {
 
     let updatedData = null;
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/flights/${editForm.value.id}`, {
+      const response = await fetch(`${API_URL}/flights/${editForm.value.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

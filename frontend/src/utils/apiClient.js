@@ -7,7 +7,7 @@ import axios from 'axios';
 
 // Ensure fallback and environment variables both explicitly route to v1
 const baseEndpoint = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-const API_URL = baseEndpoint.endsWith('/v1') ? baseEndpoint : `${baseEndpoint}/v1`;
+export const API_URL = baseEndpoint.endsWith('/v1') ? baseEndpoint : `${baseEndpoint}/v1`;
 
 // Create axios instance with default config
 const apiClient = axios.create({

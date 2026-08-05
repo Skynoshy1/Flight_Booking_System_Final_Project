@@ -65,6 +65,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { API_URL } from '@/utils/apiClient';
 
 const selectedHub = ref('SGN');
 const activeAirport = computed(() => {
@@ -76,7 +77,7 @@ const airportList = ref([]);
 
 const fetchLiveAirports = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/airports/all');
+    const response = await fetch(`${API_URL}/airports/all`);
     if (!response.ok) throw new Error('Failed to fetch airports');
     airportList.value = await response.json();
     if (airportList.value.length > 0) {
@@ -90,7 +91,7 @@ const fetchLiveAirports = async () => {
 
 const loadGlobalRecords = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/bookings/admin_all');
+    const response = await fetch(`${API_URL}/bookings/admin_all`);
     if (!response.ok) throw new Error('Failed to fetch regional telemetry');
     allGlobalBookings.value = await response.json();
     filterBookingsByRegion();

@@ -208,6 +208,7 @@ import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import FlightSearch from '../components/booking/FlightSearch.vue';
 import FlightCard from '../components/booking/FlightCard.vue';
+import { API_URL } from '../utils/apiClient.js';
 
 const router = useRouter();
 const sortBy = ref('price-asc');
@@ -539,7 +540,7 @@ const handleSearch = async (searchCriteria) => {
   currentSearchCriteria.value = searchCriteria;
   try {
     const tripTypeParam = searchCriteria && searchCriteria.tripType === 'roundTrip' ? 'round-trip' : 'one-way';
-    const response = await fetch(`http://127.0.0.1:8000/api/v1/flights/public?trip_type=${tripTypeParam}`);
+    const response = await fetch(`${API_URL}/flights/public?trip_type=${tripTypeParam}`);
     if (!response.ok) throw new Error('Failed to fetch flights');
     const data = await response.json();
     flights.value = data.map(f => ({
@@ -608,7 +609,7 @@ let flightsRealtimeChannel = null;
 const loadPublicFlights = async () => {
   try {
     const tripTypeParam = currentSearchCriteria.value && currentSearchCriteria.value.tripType === 'roundTrip' ? 'round-trip' : 'one-way';
-    const response = await fetch(`http://127.0.0.1:8000/api/v1/flights/public?trip_type=${tripTypeParam}`);
+    const response = await fetch(`${API_URL}/flights/public?trip_type=${tripTypeParam}`);
     if (!response.ok) throw new Error('Failed to fetch flights');
     const data = await response.json();
     flights.value = data.map(f => ({

@@ -155,7 +155,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import apiClient from '../utils/apiClient.js';
+import apiClient, { API_URL } from '../utils/apiClient.js';
 
 const router = useRouter();
 const activeTab = ref('tickets');
@@ -188,7 +188,7 @@ const comment = ref('');
 
 const submitReview = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/reviews', {
+    const response = await fetch(`${API_URL}/reviews`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

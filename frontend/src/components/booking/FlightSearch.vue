@@ -121,6 +121,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { API_URL } from '@/utils/apiClient';
 
 const emit = defineEmits(['search']);
 
@@ -169,7 +170,7 @@ const closeDropdowns = () => {
 
 const loadSearchAirports = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/airports/all');
+    const response = await fetch(`${API_URL}/airports/all`);
     if (!response.ok) throw new Error('Failed to fetch search airports');
     localAirports.value = await response.json();
   } catch (error) {

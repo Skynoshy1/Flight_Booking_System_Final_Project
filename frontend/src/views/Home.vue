@@ -393,6 +393,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import { API_URL } from '@/utils/apiClient';
 
 const showCookies = ref(true);
 const flightCount = ref('1,000');
@@ -424,7 +425,7 @@ const fetchLocalRoutes = async () => {
   ];
 
   try {
-    const res = await fetch('http://localhost:8000/api/v1/flights');
+    const res = await fetch(`${API_URL}/flights`);
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -517,7 +518,7 @@ onMounted(async () => {
 
   // Fetch flight count dynamically
   try {
-    const res = await fetch('http://localhost:8000/api/v1/flights');
+    const res = await fetch(`${API_URL}/flights`);
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {

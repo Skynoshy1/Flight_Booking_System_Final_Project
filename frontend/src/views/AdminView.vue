@@ -327,7 +327,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import AnalyticsCard from '../components/admin/AnalyticsCard.vue';
 import FlightTable from '../components/admin/FlightTable.vue';
-import apiClient from '../utils/apiClient.js';
+import apiClient, { API_URL } from '../utils/apiClient.js';
 import { supabase } from '../supabase.js';
 import {
   Chart as ChartJS,
@@ -351,7 +351,7 @@ let realtimeChannel = null;
 
 const fetchFlightTypePopularity = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/analytics/flight-type-popularity');
+    const response = await fetch(`${API_URL}/analytics/flight-type-popularity`);
     if (!response.ok) throw new Error('Failed to fetch flight type popularity');
     flightTypePopularity.value = await response.json();
   } catch (error) {
@@ -617,7 +617,7 @@ const weeklyRevenue = ref([]);
 
 const fetchWeeklyRevenue = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/analytics/revenue-weekly');
+    const response = await fetch(`${API_URL}/analytics/revenue-weekly`);
     if (!response.ok) throw new Error('Failed to fetch weekly revenue');
     weeklyRevenue.value = await response.json();
   } catch (error) {
@@ -627,7 +627,7 @@ const fetchWeeklyRevenue = async () => {
 
 const fetchDashboardStats = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/analytics/dashboard-stats');
+    const response = await fetch(`${API_URL}/analytics/dashboard-stats`);
     if (!response.ok) throw new Error('Failed to fetch dashboard stats');
     stats.value = await response.json();
   } catch (error) {
@@ -639,7 +639,7 @@ const adminFlights = ref([]);
 
 const fetchAdminFlights = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/flights');
+    const response = await fetch(`${API_URL}/flights`);
     if (!response.ok) throw new Error('Failed to fetch flights');
     const freshData = await response.json();
     
@@ -688,7 +688,7 @@ const closeBookingModal = () => {
 
 const fetchAllUserBookings = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/bookings/admin_all');
+    const response = await fetch(`${API_URL}/bookings/admin_all`);
     if (!response.ok) throw new Error('Failed to fetch bookings');
     adminBookings.value = await response.json();
   } catch (error) {
@@ -712,7 +712,7 @@ onMounted(async () => {
   fetchLikesSummary();
   fetchFlightTypePopularity();
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/v1/analytics/admin');
+    const response = await fetch(`${API_URL}/analytics/admin`);
     if (!response.ok) throw new Error('Failed to load analytics');
     analyticsData.value = await response.json();
   } catch (error) {
