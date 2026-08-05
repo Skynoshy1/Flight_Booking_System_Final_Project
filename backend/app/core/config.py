@@ -19,7 +19,12 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
     
     # CORS
-    CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: list = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "https://skynoshy1.github.io"
+    ]
     
     # Database
     DATABASE_URL: str = "sqlite:///./traveloka_flights.db"
