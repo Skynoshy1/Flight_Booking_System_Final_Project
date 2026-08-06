@@ -34,7 +34,7 @@
             class="nav-link"
             active-class="active"
           >
-            <i class="icon">🎫</i>
+            <i class="icon" :class="{ 'pulse-icon': hasUnfinishedBooking }">🎫</i>
             <span>My Bookings</span>
           </router-link>
           <router-link to="/about" class="nav-link" active-class="active">
@@ -140,7 +140,7 @@
               <i class="icon">📊</i> Booking Distribution
             </router-link>
             <router-link v-else to="/booking" class="mobile-nav-link" @click="isMobileMenuOpen = false">
-              <i class="icon">🎫</i> My Bookings
+              <i class="icon" :class="{ 'pulse-icon': hasUnfinishedBooking }">🎫</i> My Bookings
             </router-link>
             <router-link to="/about" class="mobile-nav-link" @click="isMobileMenuOpen = false">
               <i class="icon">ℹ️</i> About
@@ -256,11 +256,22 @@ const checkUser = async () => {
   }
 };
 
+const hasUnfinishedBooking = ref(false);
+
+const checkUnfinishedBooking = () => {
+  hasUnfinishedBooking.value = !!localStorage.getItem('selected_flight');
+};
+
 const logout = () => {
   localStorage.removeItem('user');
+  localStorage.removeItem('selected_flight');
+  localStorage.removeItem('pending_booking_id');
+  localStorage.removeItem('pending_selected_seats');
   user.value = null;
   router.push('/');
 };
+
+let checkInterval = null;
 
 onMounted(() => {
   const cachedAirport = localStorage.getItem('user_nearest_airport');
@@ -293,11 +304,19 @@ onMounted(() => {
   }
 
   checkUser();
+  checkUnfinishedBooking();
   window.addEventListener('storage', checkUser);
+  window.addEventListener('selected-flight-updated', checkUnfinishedBooking);
+  
+  checkInterval = setInterval(checkUnfinishedBooking, 1000);
 });
 
 onUnmounted(() => {
   window.removeEventListener('storage', checkUser);
+  window.removeEventListener('selected-flight-updated', checkUnfinishedBooking);
+  if (checkInterval) {
+    clearInterval(checkInterval);
+  }
 });
 </script>
 
@@ -687,5 +706,24 @@ onUnmounted(() => {
   }
 }
 
-</style>
+@keyframes pulseGlow {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 4px #ff5e1f);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
+.pulse-icon {
+  animation: pulseGlow 1.5s infinite ease-in-out;
+  display: inline-block;
+}
+</style>

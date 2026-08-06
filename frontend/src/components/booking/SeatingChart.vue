@@ -92,7 +92,7 @@
           <div class="class-info">
             <span class="class-name">First Class</span>
             <span class="class-rows">Rows 1-2</span>
-            <span class="class-price">$350</span>
+            <span class="class-price">${{ (basePrice + 100).toFixed(2) }}</span>
           </div>
         </div>
         <div class="legend-class-item">
@@ -100,7 +100,7 @@
           <div class="class-info">
             <span class="class-name">Business Class</span>
             <span class="class-rows">Rows 3-6</span>
-            <span class="class-price">$220</span>
+            <span class="class-price">${{ (basePrice + 50).toFixed(2) }}</span>
           </div>
         </div>
         <div class="legend-class-item">
@@ -108,7 +108,7 @@
           <div class="class-info">
             <span class="class-name">Economy Class</span>
             <span class="class-rows">Rows 7-{{ totalRows }}</span>
-            <span class="class-price">$120</span>
+            <span class="class-price">${{ basePrice.toFixed(2) }}</span>
           </div>
         </div>
       </div>
@@ -152,6 +152,10 @@ const props = defineProps({
   totalSeats: {
     type: Number,
     default: 180
+  },
+  basePrice: {
+    type: Number,
+    default: 120
   }
 });
 
@@ -187,9 +191,9 @@ const seatPrice = computed(() => {
   if (!props.modelValue || props.modelValue.length === 0) return 0;
   return props.modelValue.reduce((total, seatId) => {
     const row = parseInt(seatId.split('-')[0]);
-    if (row <= 2) return total + 350;
-    if (row <= 6) return total + 220;
-    return total + 120;
+    if (row <= 2) return total + props.basePrice + 100;
+    if (row <= 6) return total + props.basePrice + 50;
+    return total + props.basePrice;
   }, 0);
 });
 

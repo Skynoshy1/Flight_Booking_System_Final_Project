@@ -56,6 +56,7 @@
               :user-booked="userBookedSeats" 
               :locked-seats="otherUsersLockedSeats"
               :total-seats="selectedFlight?.total_seats || 180"
+              :base-price="baseFlightPrice"
             />
           </div>
 
@@ -234,6 +235,18 @@ const showSuccessModal = ref(false);
 const router = useRouter();
 const route = useRoute();
 
+const saveFlightToStorage = (flight) => {
+  localStorage.setItem('selected_flight', JSON.stringify(flight));
+  window.dispatchEvent(new CustomEvent('selected-flight-updated'));
+};
+
+const clearFlightFromStorage = () => {
+  localStorage.removeItem('selected_flight');
+  localStorage.removeItem('pending_booking_id');
+  localStorage.removeItem('pending_selected_seats');
+  window.dispatchEvent(new CustomEvent('selected-flight-updated'));
+};
+
 const selectedSeats = ref([]);
 const otherUsersSeatsMap = ref({});
 const otherUsersLockedSeats = computed(() => {
@@ -279,8 +292,44 @@ const fetchOccupiedSeats = async () => {
 };
 
 onMounted(async () => {
-  const flightIdFromQuery = route.query.flight_id || route.query.id;
-  const bookingIdFromQuery = route.query.booking_id;
+  let flightIdFromQuery = route.query.flight_id || route.query.id;
+  let bookingIdFromQuery = route.query.booking_id;
+  
+  // Restore from localStorage if query parameters are missing
+  if (!flightIdFromQuery) {
+    const stored = localStorage.getItem('selected_flight');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.id) {
+          const storedBookingId = localStorage.getItem('pending_booking_id');
+          router.replace({
+            path: '/booking',
+            query: {
+              id: parsed.id,
+              airline: parsed.airline,
+              flightNumber: parsed.flightNumber,
+              origin: parsed.origin,
+              destination: parsed.destination,
+              price: parsed.base_price,
+              departureTime: parsed.departureTime,
+              arrivalTime: parsed.arrivalTime,
+              booking_id: storedBookingId || undefined
+            }
+          });
+          return;
+        }
+      } catch (e) {}
+    }
+  }
+  
+  // Restore selected seats if present in localStorage
+  const storedSeats = localStorage.getItem('pending_selected_seats');
+  if (storedSeats) {
+    try {
+      selectedSeats.value = JSON.parse(storedSeats);
+    } catch (e) {}
+  }
   
   if (bookingIdFromQuery) {
     currentBookingId.value = bookingIdFromQuery;
@@ -302,7 +351,7 @@ onMounted(async () => {
             departureTime: flight.departure_time || flight.departureTime,
             arrivalTime: flight.arrival_time || flight.arrivalTime
           };
-          localStorage.setItem('selected_flight', JSON.stringify(selectedFlight.value));
+          saveFlightToStorage(selectedFlight.value);
         }
       }
     } catch (e) {
@@ -326,6 +375,7 @@ onMounted(async () => {
       });
       if (response && response.data && response.data.received_data && response.data.received_data.id) {
         currentBookingId.value = response.data.received_data.id;
+        localStorage.setItem('pending_booking_id', currentBookingId.value);
         router.replace({
           path: route.path,
           query: {
@@ -436,15 +486,14 @@ onMounted(async () => {
 
 const getInitialFlight = () => {
   const flightIdFromQuery = route.query.flight_id || route.query.id;
-  if (!flightIdFromQuery) {
-    localStorage.removeItem('selected_flight');
-    return null;
-  }
   const stored = localStorage.getItem('selected_flight');
   if (stored) {
     try {
       const flightObj = JSON.parse(stored);
-      if (flightObj && flightObj.id == flightIdFromQuery) {
+      if (flightObj) {
+        if (flightIdFromQuery && flightObj.id != flightIdFromQuery) {
+          return null;
+        }
         return flightObj;
       }
     } catch (e) {}
@@ -462,7 +511,6 @@ watch(() => route.fullPath, async () => {
   if (!flightIdFromQuery) {
     selectedFlight.value = null;
     selectedSeats.value = [];
-    localStorage.removeItem('selected_flight');
   } else {
     const stored = localStorage.getItem('selected_flight');
     if (stored) {
@@ -493,7 +541,7 @@ watch(() => route.fullPath, async () => {
             departureTime: flight.departure_time || flight.departureTime,
             arrivalTime: flight.arrival_time || flight.arrivalTime
           };
-          localStorage.setItem('selected_flight', JSON.stringify(selectedFlight.value));
+          saveFlightToStorage(selectedFlight.value);
         }
       } catch (e) {
         console.error(e);
@@ -509,7 +557,7 @@ const showCancelModal = ref(false);
 const showArchiveModal = ref(false);
 
 const archiveBooking = () => {
-  localStorage.removeItem('selected_flight');
+  clearFlightFromStorage();
   selectedFlight.value = null;
   selectedSeats.value = [];
   currentBookingId.value = null;
@@ -525,7 +573,7 @@ const deleteAndQuitBooking = async () => {
       console.error('Error deleting pending booking:', error);
     }
   }
-  localStorage.removeItem('selected_flight');
+  clearFlightFromStorage();
   selectedFlight.value = null;
   selectedSeats.value = [];
   currentBookingId.value = null;
@@ -697,7 +745,7 @@ const submitBookingToDatabase = async () => {
 };
 
 const handleSuccessOk = () => {
-  localStorage.removeItem('selected_flight');
+  clearFlightFromStorage();
   selectedFlight.value = null;
   selectedSeats.value = [];
   currentBookingId.value = null;
@@ -706,6 +754,7 @@ const handleSuccessOk = () => {
 };
 
 watch(selectedSeats, (newSeats) => {
+  localStorage.setItem('pending_selected_seats', JSON.stringify(newSeats));
   if (seatSyncChannel) {
     seatSyncChannel.send({
       type: 'broadcast',
