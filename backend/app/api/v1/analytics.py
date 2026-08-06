@@ -90,17 +90,20 @@ def get_admin_analytics():
 @router.get("/dashboard-stats")
 def get_dashboard_stats():
     try:
-        from sqlalchemy import create_engine, text
-        from app.core.config import settings
-        engine = create_engine(settings.DATABASE_URL)
-        with engine.connect() as conn:
-            rev_res = conn.execute(text("SELECT COALESCE(SUM(total_price), 0.0), COUNT(id) FROM bookings")).fetchone()
-            total_revenue = float(rev_res[0])
-            total_bookings = int(rev_res[1])
-            
-            flights_res = conn.execute(text("SELECT COUNT(id) FROM flights WHERE UPPER(COALESCE(status, '')) NOT IN ('CANCELED', 'CANCELLED')")).fetchone()
-            active_flights = int(flights_res[0])
-            
+        bookings_resp = supabase_client.table("bookings").select("total_price").execute()
+        bookings_data = bookings_resp.data or []
+        
+        total_revenue = sum(float(b.get("total_price") or 0.0) for b in bookings_data)
+        total_bookings = len(bookings_data)
+        
+        flights_resp = supabase_client.table("flights").select("status").execute()
+        flights_data = flights_resp.data or []
+        
+        active_flights = sum(
+            1 for f in flights_data
+            if str(f.get("status") or "").upper() not in ("CANCELED", "CANCELLED")
+        )
+        
         avg_booking_value = (total_revenue / total_bookings) if total_bookings > 0 else 0.0
         
         return {
