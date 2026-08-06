@@ -16,64 +16,72 @@
       <div class="container">
         <!-- Filters & Sort -->
         <div class="filter-bar">
-          <div class="filter-group">
-            <span class="filter-label">Sort by:</span>
-            <div class="input-wrapper custom-dropdown" :class="{ 'custom-dropdown-open': sortDropdownOpen }">
-              <div @click="toggleSortDropdown" class="filter-select custom-select-trigger">
-                {{ currentSortLabel }}
-              </div>
-              
-              <transition name="dropdown-slide">
-                <div v-show="sortDropdownOpen" class="custom-options-container">
-                  <div 
-                    class="custom-option"
-                    :class="{ selected: sortBy === 'price-asc' }"
-                    @click.stop="selectSort('price-asc')"
-                  >
-                    <span class="option-name">Price: Low to High</span>
-                  </div>
-                  <div 
-                    class="custom-option"
-                    :class="{ selected: sortBy === 'price-desc' }"
-                    @click.stop="selectSort('price-desc')"
-                  >
-                    <span class="option-name">Price: High to Low</span>
-                  </div>
-                  <div 
-                    class="custom-option"
-                    :class="{ selected: sortBy === 'duration' }"
-                    @click.stop="selectSort('duration')"
-                  >
-                    <span class="option-name">Duration</span>
-                  </div>
-                  <div 
-                    class="custom-option"
-                    :class="{ selected: sortBy === 'departure' }"
-                    @click.stop="selectSort('departure')"
-                  >
-                    <span class="option-name">Departure Time</span>
-                  </div>
+          <div class="filter-bar-main">
+            <div class="filter-group">
+              <span class="filter-label">Sort by:</span>
+              <div class="input-wrapper custom-dropdown" :class="{ 'custom-dropdown-open': sortDropdownOpen }">
+                <div @click="toggleSortDropdown" class="filter-select custom-select-trigger">
+                  {{ currentSortLabel }}
                 </div>
-              </transition>
+                
+                <transition name="dropdown-slide">
+                  <div v-show="sortDropdownOpen" class="custom-options-container">
+                    <div 
+                      class="custom-option"
+                      :class="{ selected: sortBy === 'price-asc' }"
+                      @click.stop="selectSort('price-asc')"
+                    >
+                      <span class="option-name">Price: Low to High</span>
+                    </div>
+                    <div 
+                      class="custom-option"
+                      :class="{ selected: sortBy === 'price-desc' }"
+                      @click.stop="selectSort('price-desc')"
+                    >
+                      <span class="option-name">Price: High to Low</span>
+                    </div>
+                    <div 
+                      class="custom-option"
+                      :class="{ selected: sortBy === 'duration' }"
+                      @click.stop="selectSort('duration')"
+                    >
+                      <span class="option-name">Duration</span>
+                    </div>
+                    <div 
+                      class="custom-option"
+                      :class="{ selected: sortBy === 'departure' }"
+                      @click.stop="selectSort('departure')"
+                    >
+                      <span class="option-name">Departure Time</span>
+                    </div>
+                  </div>
+                </transition>
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <span class="filter-label">Max Price: ${{ maxPrice }}</span>
+              <input 
+                type="range" 
+                v-model="maxPrice" 
+                min="0" 
+                max="500" 
+                class="filter-slider"
+              />
+            </div>
+
+            <div class="filter-group">
+              <label class="checkbox">
+                <input type="checkbox" v-model="directFlightsOnly" />
+                <span>Direct flights only</span>
+              </label>
             </div>
           </div>
 
-          <div class="filter-group">
-            <span class="filter-label">Max Price: ${{ maxPrice }}</span>
-            <input 
-              type="range" 
-              v-model="maxPrice" 
-              min="0" 
-              max="500" 
-              class="filter-slider"
-            />
-          </div>
-
-          <div class="filter-group">
-            <label class="checkbox">
-              <input type="checkbox" v-model="directFlightsOnly" />
-              <span>Direct flights only</span>
-            </label>
+          <div class="filter-bar-actions">
+            <button class="reset-filter-btn" @click="resetAllFiltersAndSearch" title="Reset all search & filters">
+              <span class="reset-icon">🔄</span> Reset Filters
+            </button>
           </div>
         </div>
 
@@ -173,12 +181,19 @@
           <div class="no-results-message">
             <div class="no-results-icon">✈️</div>
             <h3>No exact matches found for this specific route/date.</h3>
-            <p>Here are all other available flights instead:</p>
           </div>
           
-          <div class="flights-list fallback-list">
+          <!-- Other Flights Badge Section -->
+          <div v-if="limitedFallbackFlights.length > 0" class="other-flights-badge-section">
+            <div class="other-flights-badge-header">
+              <span class="other-flights-badge">Other flights you might be interested in</span>
+              <p class="other-flights-subtitle">Explore more available routes and discover great deals</p>
+            </div>
+          </div>
+          
+          <div v-if="limitedFallbackFlights.length > 0" class="flights-list fallback-list">
             <FlightCard
-              v-for="flight in fallbackFlights"
+              v-for="flight in limitedFallbackFlights"
               :key="flight.id"
               :flight="flight"
               @select="handleSelectFlight"
@@ -301,6 +316,15 @@ const changePage = (page) => {
 const clearSearch = () => {
   currentSearchCriteria.value = null;
   searchKey.value += 1;
+};
+
+const resetAllFiltersAndSearch = () => {
+  sortBy.value = 'price-asc';
+  maxPrice.value = 500;
+  directFlightsOnly.value = false;
+  currentSearchCriteria.value = null;
+  searchKey.value += 1;
+  handleSearch(null);
 };
 
 // Mock flight data
@@ -446,7 +470,7 @@ const filteredFlights = computed(() => {
       result = result.filter(flight => {
         if (flightNumber && flightNumber !== '') {
           const fn = String(flight.flightNumber || flight.flight_number || '').toLowerCase();
-          if (!fn.includes(flightNumber.toLowerCase())) return false;
+          return fn.includes(flightNumber.toLowerCase());
         }
         if (origin && flight.origin !== origin) return false;
         if (destination && flight.destination !== destination) return false;
@@ -766,12 +790,27 @@ onUnmounted(() => {
   padding: 1.5rem 2rem;
   border-radius: 20px;
   display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  gap: 1.5rem;
   margin-bottom: 2rem;
   box-shadow: 4px 4px 0px #03121A;
   border: 2px solid #03121A;
+}
+
+.filter-bar-main {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.filter-bar-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 1rem;
 }
 
 .filter-group {
@@ -1186,5 +1225,38 @@ onUnmounted(() => {
 .signin-orange-btn:hover {
   background: #e04f1a;
   transform: translateY(-1px);
+}
+
+.reset-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid #03121A;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #03121A;
+  background-color: #f1f5f9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 2px 2px 0px #03121A;
+  height: 44px;
+}
+
+.reset-filter-btn:hover {
+  background-color: #ff5e1f;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px #03121A;
+}
+
+.reset-filter-btn:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0px #03121A;
+}
+
+.reset-icon {
+  font-size: 1rem;
 }
 </style>

@@ -188,6 +188,11 @@ const loadSearchAirports = async () => {
 const tripType = ref('oneWay');
 
 watch(tripType, () => {
+  origin.value = 'SGN';
+  destination.value = 'HAN';
+  departureDate.value = '';
+  returnDate.value = '';
+  flightNumberQuery.value = '';
   searchFlights();
 });
 const origin = ref('SGN');
