@@ -25,12 +25,17 @@ class UserRegister(BaseModel):
     region: str
     national_id: str
     avatar_url: str
+    redirect_to: Optional[str] = None
 
 @router.post("/signup")
 def sign_up(data: UserRegister):
     try:
-        # Call Supabase auth sign up
-        response = supabase_client.auth.sign_up({"email": data.email, "password": data.password})
+        # Call Supabase auth sign up with options if redirect_to is provided
+        signup_params = {"email": data.email, "password": data.password}
+        if data.redirect_to:
+            signup_params["options"] = {"email_redirect_to": data.redirect_to}
+            
+        response = supabase_client.auth.sign_up(signup_params)
         user = response.user
         if not user:
             raise HTTPException(

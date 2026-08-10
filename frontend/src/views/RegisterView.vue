@@ -155,6 +155,10 @@ const handleAvatarUpload = (event) => {
 const handleRegister = async () => {
   loading.value = true;
   try {
+    // Generate dynamic redirect URL based on current host environment (localhost or Github Pages)
+    const currentOrigin = window.location.origin + window.location.pathname;
+    const redirectTo = currentOrigin.endsWith('/') ? `${currentOrigin}#/signin` : `${currentOrigin}/#/signin`;
+
     const response = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       headers: {
@@ -167,7 +171,8 @@ const handleRegister = async () => {
         phone: phone.value,
         region: region.value,
         national_id: nationalId.value,
-        avatar_url: avatarUrl.value
+        avatar_url: avatarUrl.value,
+        redirect_to: redirectTo
       })
     });
 
