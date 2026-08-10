@@ -354,15 +354,18 @@ def get_my_summary(current_user: dict = Depends(get_current_user)):
         else:
             # Check if pending booking is expired (departure time in past)
             if flight:
-                dep_date = flight.get("departure_date")
                 dep_time = flight.get("departure_time")
-                if dep_date and dep_time:
+                if dep_time:
                     try:
-                        dep_dt_str = f"{dep_date} {dep_time[:5]}"
-                        departure_dt = datetime.strptime(dep_dt_str, "%Y-%m-%d %H:%M")
-                        if datetime.now() > departure_dt:
+                        departure_dt = datetime.fromisoformat(str(dep_time))
+                        if departure_dt.tzinfo is not None:
+                            now_to_compare = datetime.now(timezone.utc)
+                        else:
+                            now_to_compare = datetime.now()
+                            
+                        if now_to_compare > departure_dt:
                             booking_id = booking.get("id")
-                            print(f"Auto-deleting expired pending booking: {booking_id} (departure: {dep_dt_str})")
+                            print(f"Auto-deleting expired pending booking: {booking_id} (departure: {dep_time})")
                             try:
                                 supabase_client.table("bookings").delete().eq("id", booking_id).execute()
                             except Exception as del_err:
