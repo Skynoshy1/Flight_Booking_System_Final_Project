@@ -57,9 +57,13 @@ def generate_flexible_flights():
     
     try:
         airports_res = supabase.table("airports").select("code").execute()
-        airport_codes = [item['code'] for item in airports_res.data]
+        airport_codes = [item['code'] for item in airports_res.data] if airports_res.data else []
     except Exception as e:
         print(f"Error fetching airports from database, using fallbacks: {e}")
+        airport_codes = []
+        
+    if not airport_codes:
+        print("Airports list is empty, using fallback codes.")
         airport_codes = ["SGN", "HAN", "DAD", "CXR", "DLI", "PQC", "HUI", "UIH", "VDO", "HPH"]
         
     print(f"Loaded {len(airport_codes)} airport codes for flight generation.")

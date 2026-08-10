@@ -12,3 +12,4 @@ python-multipart>=0.0.12
 email-validator>=2.2.0
 supabase>=2.31.0
 psycopg2-binary>=2.9.12
+schedule>=1.2.2
